@@ -11,7 +11,8 @@ This report is answering questions related to personal step tracking data of an 
 ## Required libraries
 
 To preprocess the data the following libraries are being used and have to be loaded before any further processing.
-```{r, warning=FALSE, message=FALSE}
+
+```r
 library(lubridate)
 library(dplyr)
 library(ggplot2)
@@ -22,7 +23,8 @@ The source data is the file *activity.zip* in the root folder of the git reposit
 
 For loading it the zip file is being unzip and read by using the *read.cvs()* function:
 
-```{r, cache = FALSE}
+
+```r
 activitySourceCompressedFile <- 'activity.zip'
 activityFile <- 'activity.csv'
 columnNames <- c("steps","date","interval")
@@ -34,12 +36,12 @@ activityData <- read.table(unz(activitySourceCompressedFile, activityFile),
                            col.names = columnNames, 
                            skip = 1, 
                            colClasses = columnClasses)
-
 ```
 The string *NA* is used to denote missing values.
 
 The third column containing the date when the activity was tracked is parsed by the lubridate library function *ymd* and converted into *POSIXct*.
-```{r, cache = FALSE}
+
+```r
 activityData$date <- ymd(activityData$date)
 ```
 
@@ -53,32 +55,47 @@ interval    | integer
 
 ## What is mean total number of steps taken per day?
 To find out what the mean total number of steps taken per day are, steps are summed up first by using the tapply function:
-```{r, cache = FALSE}
+
+```r
 stepsPerDay <- with(activityData, tapply(steps, date, sum, na.rm = TRUE))
 ```
 
 The following histogram gives an impression on how the data is distributed:
-```{r, fig.width=4, fig.height=4, cache = FALSE}
+
+```r
 hist(stepsPerDay, main = "Steps per day histogram", xlab = "Total number of steps per day")
 ```
 
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png) 
+
 The calculation of the mean total number of steps is done by the *mean* function:
-```{r, cache = FALSE}
+
+```r
 meanStepsPerDay <- mean(stepsPerDay)
 meanStepsPerDay 
 ```
 
+```
+## [1] 9354.23
+```
+
 The median is being calculated by applying the *median* function:
-```{r, cache = FALSE}
+
+```r
 medianStepsPerDay <- median(stepsPerDay)
 medianStepsPerDay 
+```
+
+```
+## [1] 10395
 ```
 
 ## What is the average daily activity pattern?
 
 To be able to understand the daily activity pattern the data is being summed per interval and averaged across all days. Missing values are ignored.
 
-```{r, cache = FALSE}
+
+```r
 stepsPerInterval <- activityData %>% 
                     na.omit() %>% 
                     group_by(interval) %>%
@@ -87,16 +104,34 @@ stepsPerInterval <- activityData %>%
 ```
 
 The following graph show the resulting daily activity pattern. 
-```{r, fig.width=6, fig.height=5}
+
+```r
 plot(stepsPerInterval,type = "l", main = "Daily activity pattern", xlab = "Intervals", ylab = "Mean steps per interval")
 ```
+
+![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png) 
 
 The pattern seems to align with what one could expect from an individual with a normal sleep / activity rythm. Throughout night ours the activity is usually low or there is no activity. In the morning hours there is an increased activity (here the hours 7am till 9am) which e.g. could hint at going to work by foot.
 
 The maximum average number of steps falls in between 8:35 and 8:40 and is about 206 steps:
-```{r}
+
+```r
 max(stepsPerInterval$mean_steps)
+```
+
+```
+## [1] 206.1698
+```
+
+```r
 stepsPerInterval[which.max(stepsPerInterval$mean_steps),1]
+```
+
+```
+## Source: local data frame [1 x 1]
+## 
+##   interval
+## 1      835
 ```
 
 
@@ -105,11 +140,23 @@ stepsPerInterval[which.max(stepsPerInterval$mean_steps),1]
 The source data contains missing values which could introduce a bias to calculations or summaries of the data.
 
 The total number of missing values for step values across the data set is 2304 which is about 13,11% of the whole data set.
-```{r}
+
+```r
 missingValues <- sum(is.na(activityData$steps))
 missingValues
+```
+
+```
+## [1] 2304
+```
+
+```r
 percentageMissingValues <- missingValues / length(activityData[,1])
 percentageMissingValues
+```
+
+```
+## [1] 0.1311475
 ```
 
 There are several strategies to fill in a missing value and the filler value could for example be based on  
@@ -121,7 +168,8 @@ There are several strategies to fill in a missing value and the filler value cou
 For creating a repaired activity data set I am using the strategy of applying the mean value for a given interval based on all days to missing values.
 
 This requires to create a function that looks up the correct value based on the already existing *stepsPerInterval* data frame. The function is than applied to the *activityData* data frame to create repaired version of it. The dplyr library is used to apply this row wise look up.
-```{r}
+
+```r
 replaceIfMissing <- function(value, targetInterval, lookup) {
     if(is.na(value)) {  
         as.integer(filter(lookup, interval == targetInterval)[,2]$mean_steps)
@@ -137,35 +185,53 @@ activityDataRepaired <- activityData %>%
 To see the effect of filling in missing values I am comparing the mean and median values for the total number of steps per day with the ones when missing values were excluded from the calculation.
 
 To find out what the mean total number of steps taken per day in the repaired data set are, steps are summed up first by using the tapply function:
-```{r, cache = FALSE}
+
+```r
 stepsPerDayRepaired <- with(activityDataRepaired, tapply(steps, date, sum, na.rm = TRUE))
 ```
 
 The following histogram gives an impression on how the data is distributed in the repaired data set:
-```{r, fig.width=5, fig.height=4, cache = TRUE}
+
+```r
 hist(stepsPerDayRepaired, main = "Steps per day histogram - Repaired data", xlab = "Total number of steps per day")
 ```
 
+![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-1.png) 
+
 The calculation of the mean and median total numbers follows:
-```{r, cache = FALSE}
+
+```r
 meanStepsPerDayRepaired <- mean(stepsPerDayRepaired)
 medianStepsPerDayRepaired <- median(stepsPerDayRepaired)
 ```
 
 The mean values are about 14.92% higher in the repaired data set whereas the median values only differ by about 2.37%:
-```{r, cache = FALSE}
+
+```r
 formatAsPercentage <- function(numericValue) {
     paste(round((numericValue) * 100, 2), "%", sep="")
 }
 formatAsPercentage((meanStepsPerDayRepaired / meanStepsPerDay) - 1)
+```
+
+```
+## [1] "14.92%"
+```
+
+```r
 formatAsPercentage((medianStepsPerDayRepaired / medianStepsPerDay) - 1)
+```
+
+```
+## [1] "2.37%"
 ```
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
 To investigate if there is a difference in the activity patterns between weekdays and weekends the intervals first have to be classified as either being weekend or weekday intervals. A new factor column is added to *activityDataRepaired* to indicate this.
 
-```{r}
+
+```r
 isWeekend <- function(dateValue) {
     if(wday(dateValue) %in% c(1,7)) {
         "weekend"
@@ -179,8 +245,11 @@ activityDataRepaired$week <- factor(activityDataRepaired$week)
 
 A panel plot shows that the maximum activity during the weekend is lower than during weekdays for the given data set and individual.
 
-```{r, fig.width=7, fig.height=4}
+
+```r
 qplot(interval, steps, data = activityDataRepaired, geom = c("line"), facets = . ~ week, stat = "summary", fun.y = "mean", ylab = "Steps", xlab = "5 min intervals", main = "Activity comparison of weekdays and weekends")
 ```
+
+![plot of chunk unnamed-chunk-18](figure/unnamed-chunk-18-1.png) 
 
 In the morning there is a higher activity during weekdays which could hint at the individual going to work. In the afternoon there is a second spike in activity which could be the way home. For all hours starting after noon there is a higher average activity during the weekend. The main activity period also lasts longer than during the week.
