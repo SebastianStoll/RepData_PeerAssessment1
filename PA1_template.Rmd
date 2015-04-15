@@ -2,7 +2,7 @@
 title: 'Reproducible Research: Peer Assessment 1'
 output:
   html_document:
-    keep_md: yes
+  keep_md: yes
   pdf_document: default
 ---
 
@@ -88,7 +88,7 @@ stepsPerInterval <- activityData %>%
 
 The following graph show the resulting daily activity pattern. 
 ```{r, fig.width=6, fig.height=5}
-plot(stepsPerInterval,type = "l", main = "Daily activity pattern", xlab = "Intervals", ylab = "Mean steps per interval")
+plot(stepsPerInterval,type = "l", main = "Daily activity pattern", xlab = "Intervals", ylab = "Mean steps per interval across all days")
 ```
 
 The pattern seems to align with what one could expect from an individual with a normal sleep / activity rythm. Throughout night ours the activity is usually low or there is no activity. In the morning hours there is an increased activity (here the hours 7am till 9am) which e.g. could hint at going to work by foot.

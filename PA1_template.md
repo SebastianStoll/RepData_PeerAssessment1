@@ -2,7 +2,7 @@
 title: 'Reproducible Research: Peer Assessment 1'
 output:
   html_document:
-    keep_md: yes
+  keep_md: yes
   pdf_document: default
 ---
 
@@ -106,7 +106,7 @@ stepsPerInterval <- activityData %>%
 The following graph show the resulting daily activity pattern. 
 
 ```r
-plot(stepsPerInterval,type = "l", main = "Daily activity pattern", xlab = "Intervals", ylab = "Mean steps per interval")
+plot(stepsPerInterval,type = "l", main = "Daily activity pattern", xlab = "Intervals", ylab = "Mean steps per interval across all days")
 ```
 
 ![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png) 
