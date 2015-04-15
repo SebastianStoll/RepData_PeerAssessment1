@@ -106,7 +106,10 @@ stepsPerInterval <- activityData %>%
 The following graph show the resulting daily activity pattern. 
 
 ```r
-plot(stepsPerInterval,type = "l", main = "Daily activity pattern", xlab = "Intervals", ylab = "Mean steps per interval across all days")
+plot(stepsPerInterval,type = "l", 
+     main = "Daily activity pattern", 
+     xlab = "Intervals", 
+     ylab = "Mean steps per interval across all days")
 ```
 
 ![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png) 
@@ -247,7 +250,14 @@ A panel plot shows that the maximum activity during the weekend is lower than du
 
 
 ```r
-qplot(interval, steps, data = activityDataRepaired, geom = c("line"), facets = . ~ week, stat = "summary", fun.y = "mean", ylab = "Steps", xlab = "5 min intervals", main = "Activity comparison of weekdays and weekends")
+qplot(interval, steps, data = activityDataRepaired, 
+      geom = c("line"), 
+      facets = . ~ week, 
+      stat = "summary", 
+      fun.y = "mean", 
+      ylab = "Steps", 
+      xlab = "5 min intervals", 
+      main = "Activity comparison of weekdays and weekends")
 ```
 
 ![plot of chunk unnamed-chunk-18](figure/unnamed-chunk-18-1.png) 
